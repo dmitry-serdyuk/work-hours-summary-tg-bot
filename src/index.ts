@@ -1,5 +1,5 @@
 import 'dotenv/config';
 
-import { startBot } from "./bot/index.js";
+import { startBot } from "./bot/bot.js";
 
 startBot();
