@@ -1,17 +1,46 @@
-import { Bot } from "grammy";
+import { Bot, Context } from "grammy";
+import {
+  Conversation,
+  conversations,
+  createConversation,
+  type ConversationFlavor,
+} from "@grammyjs/conversations";
 
-const bot = new Bot(process.env.BOT_TOKEN!);
+import { startCommand } from "./commands/start.js";
+import { addTimeCommand } from "./commands/add-time.js";
+import { editTimeCommand } from "./commands/edit-time.js";
+import { calendarCommand } from "./commands/calendar.js";
+import { reportCommand } from "./commands/report.js";
+import { settingsCommand } from "./commands/settings.js";
+import { helpCommand } from "./commands/help.js";
 
-bot.command("start", (ctx) => {
-  ctx.reply("Hello! I am your worked hours bot.");
+import { addTimeConversation } from "./conversations/add-time.js";
+
+export type BotContext = ConversationFlavor<Context>;
+export type BotConversationContext = Context;
+export type BotConversation = Conversation<BotContext, BotConversationContext>;
+
+const bot = new Bot<BotContext>(process.env.BOT_TOKEN!);
+
+// plugins
+bot.use(conversations());
+
+// dialogs
+bot.use(createConversation(addTimeConversation));
+
+// comands
+bot.command("start", startCommand);
+bot.command("addtime", addTimeCommand);
+bot.command("edittime", editTimeCommand);
+bot.command("calendar", calendarCommand);
+bot.command("report", reportCommand);
+bot.command("settings", settingsCommand);
+bot.command("help", helpCommand);
+
+// TODO
+bot.on("message", (ctx) => {
+  ctx.reply("Обработать запрос не по команде");
 });
-
-// help - команда для вывода справки по использованию бота
-// settings - возможность добавить дату для начала отсчета. к примеру 10 число каждого месяца, указать почасовую ставку (если нужно)
-// add - команда для добавления отработанных часов за конкретный день
-// edit - команда для редактирования ранее добавленных часов ??? нужно ли?
-// calendar - команда для вывода календаря с уже добавленными часами\возможностью добавления новых\редактирования существующих
-// report - команда для вывода отчета по отработанным часам за текущий месяц
 
 export const startBot = () => {
   bot.start();
